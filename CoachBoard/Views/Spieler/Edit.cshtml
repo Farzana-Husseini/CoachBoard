@@ -1,0 +1,41 @@
+﻿@model CoachBoard.ViewModels.SpielerEditViewModel
+@{
+    ViewData["Title"] = "Spieler Bearbeiten";
+}
+
+<h2>Spieler Bearbeiten</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="Vorname" class="form-label"></label>
+        <input asp-for="Vorname" class="form-control" /><span asp-validation-for="Vorname" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Nachname" class="form-label"></label>
+        <input asp-for="Nachname" class="form-control" /><span asp-validation-for="Nachname" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="NewPassword" class="form-label"></label>
+        <input asp-for="NewPassword" class="form-control" /><span asp-validation-for="NewPassword" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Role" class="form-label"></label>
+        <select asp-for="Role" class="form-select">
+            <option value="Spieler">Spieler</option>
+            <option value="Trainer">Trainer</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+    <button class="btn btn-primary">Speichern</button>
+    <a asp-action="Index" class="btn btn-link">Abbrechen</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

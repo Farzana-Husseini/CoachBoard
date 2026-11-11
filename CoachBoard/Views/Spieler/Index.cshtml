@@ -1,0 +1,37 @@
+﻿@model IEnumerable<CoachBoard.Models.User>
+@{
+    ViewData["Title"] = "Benutzer";
+    var meineId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<h2>Benutzerübersicht</h2>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+<p><a asp-action="Create" class="btn btn-primary">Neuen Benutzer anlegen</a></p>
+
+<table class="table table-striped">
+    <thead><tr><th>Name</th><th>E-Mail</th><th>Rolle</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.VollerName</td>
+                <td>@s.Email</td>
+                <td>@s.Role</td>
+                <td class="text-end">
+                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-secondary">Bearbeiten</a>
+                    @if (s.Id.ToString() != meineId)
+                    {
+                        <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-outline-danger">Löschen</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

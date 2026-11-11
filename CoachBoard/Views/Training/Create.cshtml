@@ -1,0 +1,16 @@
+﻿@model CoachBoard.ViewModels.TrainingFormViewModel
+@{
+    ViewData["Title"] = "Trainingseinheit anlegen";
+}
+
+<h2>Trainingseinheit anlegen</h2>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <partial name="_TrainingFelder" model="Model" />
+    <button class="btn btn-primary">Speichern</button>
+    <a asp-action="Index" class="btn btn-link">Abbrechen</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

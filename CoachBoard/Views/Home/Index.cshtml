@@ -1,0 +1,38 @@
+﻿@model CoachBoard.Models.Trainingseinheit
+@using System.Globalization
+@{
+    ViewData["Title"] = "Start";
+    var de = new CultureInfo("de-AT");
+}
+
+<h1 class="display-6 mb-4">Willkommen, @User.Identity?.Name</h1>
+
+<div class="card" style="max-width: 34rem;">
+    <div class="card-header fw-bold">Nächstes Training</div>
+    <div class="card-body">
+        @if (Model == null)
+        {
+            <p class="text-muted mb-3">Aktuell ist kein Training geplant.</p>
+        }
+        else
+        {
+            var tage = (Model.Beginn.Date - DateTime.Today).Days;
+            var wann = tage == 0 ? "heute" : tage == 1 ? "morgen" : $"in {tage} Tagen";
+
+            <h5 class="card-title">@Model.Beginn.ToString("dddd, dd.MM.yyyy", de)</h5>
+            <p class="mb-1"><strong>@Model.Beginn.ToString("HH:mm") Uhr</strong> <span class="text-muted">(@wann)</span></p>
+            <p class="mb-1">Ort: @Model.Ort</p>
+            @if (!string.IsNullOrWhiteSpace(Model.Beschreibung))
+            {
+                <p class="mb-3">@Model.Beschreibung</p>
+            }
+            <a asp-controller="Training" asp-action="Details" asp-route-id="@Model.Id"
+               class="btn btn-sm btn-outline-primary">Details</a>
+        }
+        <a asp-controller="Training" asp-action="Index" class="btn btn-sm btn-outline-secondary">Alle Einheiten</a>
+        @if (User.IsInRole("Trainer"))
+        {
+            <a asp-controller="Training" asp-action="Create" class="btn btn-sm btn-primary">Neue Einheit</a>
+        }
+    </div>
+</div>

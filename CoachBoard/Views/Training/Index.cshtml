@@ -1,0 +1,148 @@
+﻿@model CoachBoard.ViewModels.TrainingIndexViewModel
+@using CoachBoard.Models
+@using CoachBoard.ViewModels
+@{
+    ViewData["Title"] = "Training";
+    var jetzt = DateTime.Now;
+    var istTrainer = User.IsInRole("Trainer");
+
+    // aktive Filter, damit sie beim Blättern erhalten bleiben
+    var route = new Dictionary<string, string>();
+    if (!string.IsNullOrEmpty(Model.Monat)) route["monat"] = Model.Monat;
+    if (Model.Zeitraum != "alle") route["zeitraum"] = Model.Zeitraum;
+    if (!string.IsNullOrEmpty(Model.Status)) route["status"] = Model.Status;
+    if (Model.SpielerId.HasValue) route["spielerId"] = Model.SpielerId.Value.ToString();
+
+    var pager = new PagerViewModel
+    {
+        Page = Model.Page,
+        TotalPages = Model.TotalPages,
+        Controller = "Training",
+        Action = "Index",
+        Route = route
+    };
+}
+
+<h2>Trainingseinheiten</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (istTrainer)
+{
+    <p><a asp-action="Create" class="btn btn-primary">Neue Trainingseinheit</a></p>
+}
+
+<form asp-action="Index" method="get" class="card card-body mb-3">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label" for="monat">Monat</label>
+            <input type="month" id="monat" name="monat" value="@Model.Monat" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label" for="zeitraum">Zeitraum</label>
+            <select id="zeitraum" name="zeitraum" class="form-select">
+                <option value="alle" selected="@(Model.Zeitraum == "alle")">Alle</option>
+                <option value="kommende" selected="@(Model.Zeitraum == "kommende")">Kommende</option>
+                <option value="vergangene" selected="@(Model.Zeitraum == "vergangene")">Vergangene</option>
+            </select>
+        </div>
+        @if (istTrainer)
+        {
+            <div class="col-md-3">
+                <label class="form-label" for="spielerId">Spieler</label>
+                <select id="spielerId" name="spielerId" class="form-select">
+                    <option value="">Kein Spieler gewählt</option>
+                    @foreach (var sp in Model.Spieler)
+                    {
+                        <option value="@sp.Id" selected="@(Model.SpielerId == sp.Id)">@sp.Name</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="col-md-2">
+            <label class="form-label" for="status">Anwesenheitsstatus</label>
+            <select id="status" name="status" class="form-select">
+                <option value="">Alle</option>
+                <option value="Anwesend" selected="@(Model.Status == "Anwesend")">Anwesend</option>
+                <option value="Abwesend" selected="@(Model.Status == "Abwesend")">Abwesend</option>
+                <option value="Entschuldigt" selected="@(Model.Status == "Entschuldigt")">Entschuldigt</option>
+                <option value="Offen" selected="@(Model.Status == "Offen")">Keine Rückmeldung</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary">Filtern</button>
+            @if (Model.HatFilter)
+            {
+                <a asp-action="Index" class="btn btn-link">Zurücksetzen</a>
+            }
+        </div>
+    </div>
+    @if (istTrainer && !Model.SpielerId.HasValue)
+    {
+        <div class="form-text mt-2">Der Anwesenheitsstatus lässt sich filtern, sobald ein Spieler gewählt ist.</div>
+    }
+</form>
+
+<p class="text-muted">@Model.TotalCount Trainingseinheit(en) gefunden, Seite @Model.Page von @Model.TotalPages</p>
+
+@if (!Model.Items.Any())
+{
+    <p class="text-muted">Keine Trainingseinheiten für diese Auswahl.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Uhrzeit</th>
+                <th>Ort / Halle</th>
+                <th>Beschreibung</th>
+                @if (Model.StatusSpalte != null)
+                {
+                    <th>@Model.StatusSpalte</th>
+                }
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.Items)
+            {
+                <tr class="@(t.Beginn < jetzt ? "text-muted" : "")">
+                    <td>@t.Beginn.ToString("dd.MM.yyyy")</td>
+                    <td>@t.Beginn.ToString("HH:mm") Uhr</td>
+                    <td>@t.Ort</td>
+                    <td>@t.Beschreibung</td>
+                    @if (Model.StatusSpalte != null)
+                    {
+                        <td>
+                            @if (Model.StatusProTraining.TryGetValue(t.Id, out var st))
+                            {
+                                <span class="badge @AnwesenheitsAnzeige.Badge(st)">@st</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">offen</span>
+                            }
+                        </td>
+                    }
+                    <td class="text-end text-nowrap">
+                        <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                        @if (istTrainer)
+                        {
+                            <a asp-controller="Anwesenheit" asp-action="Einheit" asp-route-id="@t.Id"
+                               class="btn btn-sm btn-outline-info">Anwesenheit</a>
+                            <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-outline-secondary">Bearbeiten</a>
+                            <a asp-action="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-outline-danger">Löschen</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <partial name="_Pager" model="pager" />
+}

@@ -1,0 +1,49 @@
+﻿@model CoachBoard.ViewModels.EinheitAnwesenheitViewModel
+@using CoachBoard.Models
+@{
+    ViewData["Title"] = "Anwesenheit";
+}
+
+<h2>Anwesenheit am @Model.Training.Beginn.ToString("dd.MM.yyyy") um @Model.Training.Beginn.ToString("HH:mm") Uhr</h2>
+<p class="text-muted">Ort: @Model.Training.Ort</p>
+
+<p>
+    <span class="badge bg-success">Anwesend: @Model.Anwesend</span>
+    <span class="badge bg-danger">Abwesend: @Model.Abwesend</span>
+    <span class="badge bg-warning text-dark">Entschuldigt: @Model.Entschuldigt</span>
+    <span class="badge bg-secondary">Keine Rückmeldung: @Model.Offen</span>
+</p>
+
+@if (!Model.Zeilen.Any())
+{
+    <p class="text-muted">Es sind noch keine Spieler angelegt.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead><tr><th>Spieler</th><th>E-Mail</th><th>Status</th><th>Zuletzt geändert</th></tr></thead>
+        <tbody>
+            @foreach (var z in Model.Zeilen)
+            {
+                <tr>
+                    <td>@z.Name</td>
+                    <td>@z.Email</td>
+                    <td>
+                        @if (z.Status.HasValue)
+                        {
+                            <span class="badge @AnwesenheitsAnzeige.Badge(z.Status.Value)">@z.Status.Value</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Keine Rückmeldung</span>
+                        }
+                    </td>
+                    <td>@(z.GeaendertAm?.ToString("dd.MM.yyyy HH:mm") ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-controller="Training" asp-action="Index" class="btn btn-link">Zurück zu den Trainingseinheiten</a>
+<a asp-action="Quote" class="btn btn-link">Anwesenheitsquote</a>

@@ -1,0 +1,68 @@
+﻿@model CoachBoard.Models.Trainingseinheit
+@using CoachBoard.Models
+@{
+    ViewData["Title"] = "Trainingseinheit";
+    var mein = ViewData["MeinStatus"] as AnwesenheitsStatus?;
+}
+
+<h2>Trainingseinheit am @Model.Beginn.ToString("dd.MM.yyyy")</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Uhrzeit</dt>
+    <dd class="col-sm-9">@Model.Beginn.ToString("HH:mm") Uhr</dd>
+    <dt class="col-sm-3">Ort / Halle</dt>
+    <dd class="col-sm-9">@Model.Ort</dd>
+    <dt class="col-sm-3">Beschreibung</dt>
+    <dd class="col-sm-9">@Model.Beschreibung</dd>
+    <dt class="col-sm-3">Geplante Übungen</dt>
+    <dd class="col-sm-9" style="white-space: pre-line">@Model.GeplanteUebungen</dd>
+</dl>
+
+@if (User.IsInRole("Spieler"))
+{
+    <div class="card mt-4" style="max-width: 36rem;">
+        <div class="card-header fw-bold">Meine Anwesenheit</div>
+        <div class="card-body">
+            <p>
+                Aktueller Status:
+                @if (mein.HasValue)
+                {
+                    <span class="badge @AnwesenheitsAnzeige.Badge(mein.Value)">@mein.Value</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">noch keine Rückmeldung</span>
+                }
+            </p>
+            <form asp-controller="Anwesenheit" asp-action="Setzen" method="post">
+                <input type="hidden" name="trainingId" value="@Model.Id" />
+                <button name="status" value="Anwesend"
+                        class="btn @(mein == AnwesenheitsStatus.Anwesend ? "btn-success" : "btn-outline-success")">
+                    Anwesend
+                </button>
+                <button name="status" value="Abwesend"
+                        class="btn @(mein == AnwesenheitsStatus.Abwesend ? "btn-danger" : "btn-outline-danger")">
+                    Abwesend
+                </button>
+                <button name="status" value="Entschuldigt"
+                        class="btn @(mein == AnwesenheitsStatus.Entschuldigt ? "btn-warning" : "btn-outline-warning")">
+                    Entschuldigt
+                </button>
+            </form>
+        </div>
+    </div>
+}
+
+<div class="mt-3">
+    @if (User.IsInRole("Trainer"))
+    {
+        <a asp-controller="Anwesenheit" asp-action="Einheit" asp-route-id="@Model.Id"
+           class="btn btn-outline-primary">Anwesenheitsliste</a>
+    }
+    <a asp-action="Index" class="btn btn-link">Zurück</a>
+</div>

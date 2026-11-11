@@ -1,0 +1,117 @@
+﻿@model CoachBoard.ViewModels.MeineHistorieViewModel
+@using System.Globalization
+@using CoachBoard.Models
+@using CoachBoard.ViewModels
+@{
+    ViewData["Title"] = "Meine Trainingshistorie";
+    var de = new CultureInfo("de-AT");
+    var farbe = Model.Quote >= 75 ? "bg-success" : Model.Quote >= 50 ? "bg-warning" : "bg-danger";
+
+    var pager = new PagerViewModel
+    {
+        Page = Model.Page,
+        TotalPages = Model.TotalPages,
+        Controller = "Anwesenheit",
+        Action = "Meine"
+    };
+}
+
+<h2>Meine Trainingshistorie</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-2">
+        <div class="card text-center">
+            <div class="card-body py-2">
+                <div class="fs-4">@Model.Gesamt</div>
+                <div class="small text-muted">Trainings gesamt</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card text-center">
+            <div class="card-body py-2">
+                <div class="fs-4 text-success">@Model.Anwesend</div>
+                <div class="small text-muted">Anwesend</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card text-center">
+            <div class="card-body py-2">
+                <div class="fs-4 text-danger">@Model.Abwesend</div>
+                <div class="small text-muted">Abwesend</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center">
+            <div class="card-body py-2">
+                <div class="fs-4 text-warning">@Model.Entschuldigt</div>
+                <div class="small text-muted">Entschuldigt</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="card text-center">
+            <div class="card-body py-2">
+                <div class="fs-4 text-secondary">@Model.Offen</div>
+                <div class="small text-muted">Keine Rückmeldung</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5>Meine Anwesenheitsquote: @Model.Quote.ToString("0.0", de) %</h5>
+<div class="progress mb-1" style="height: 18px; max-width: 36rem;">
+    <div class="progress-bar @farbe" role="progressbar"
+         style="width: @(Model.Quote.ToString(CultureInfo.InvariantCulture))%"></div>
+</div>
+<p class="text-muted small">
+    Anwesend / Trainingseinheiten (@(Model.NurStattgefundene ? "nur bereits begonnene" : "alle")):
+    @Model.Anwesend von @Model.Gesamt.
+</p>
+
+@if (!Model.Zeilen.Any())
+{
+    <p class="text-muted">Es gibt noch keine Trainingseinheiten.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Uhrzeit</th>
+                <th>Ort / Halle</th>
+                <th>Mein Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var z in Model.Zeilen)
+            {
+                <tr>
+                    <td>@z.Training.Beginn.ToString("dd.MM.yyyy")</td>
+                    <td>@z.Training.Beginn.ToString("HH:mm") Uhr</td>
+                    <td>@z.Training.Ort</td>
+                    <td>
+                        @if (z.Status.HasValue)
+                        {
+                            <span class="badge @AnwesenheitsAnzeige.Badge(z.Status.Value)">@z.Status.Value</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Keine Rückmeldung</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a asp-controller="Training" asp-action="Details" asp-route-id="@z.Training.Id"
+                           class="btn btn-sm btn-outline-primary">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <partial name="_Pager" model="pager" />
+}

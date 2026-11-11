@@ -1,0 +1,55 @@
+﻿@model CoachBoard.ViewModels.QuoteViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Anwesenheitsquote";
+    var de = new CultureInfo("de-AT");
+}
+
+<h2>Anwesenheitsquote</h2>
+<p class="text-muted">
+    Quote = Anzahl anwesend / Anzahl Trainingseinheiten
+    (@(Model.NurStattgefundene ? "nur bereits begonnene" : "alle")): @Model.AnzahlTrainings.
+    Abwesend, entschuldigt und fehlende Rückmeldungen zählen nicht als anwesend.
+</p>
+
+@if (!Model.Zeilen.Any())
+{
+    <p class="text-muted">Es sind noch keine Spieler angelegt.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Spieler</th>
+                <th>Anwesend</th>
+                <th>Abwesend</th>
+                <th>Entschuldigt</th>
+                <th>Offen</th>
+                <th style="min-width: 12rem;">Quote</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var z in Model.Zeilen)
+            {
+                var farbe = z.Quote >= 75 ? "bg-success" : z.Quote >= 50 ? "bg-warning" : "bg-danger";
+                <tr>
+                    <td>@z.Name</td>
+                    <td>@z.Anwesend</td>
+                    <td>@z.Abwesend</td>
+                    <td>@z.Entschuldigt</td>
+                    <td>@z.Offen</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress flex-grow-1" style="height: 14px;">
+                                <div class="progress-bar @farbe" role="progressbar"
+                                     style="width: @(z.Quote.ToString(CultureInfo.InvariantCulture))%"></div>
+                            </div>
+                            <strong>@z.Quote.ToString("0.0", de) %</strong>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

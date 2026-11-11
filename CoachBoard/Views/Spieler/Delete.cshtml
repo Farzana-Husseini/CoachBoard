@@ -1,0 +1,8 @@
+﻿@model CoachBoard.Models.User
+<h2>Spieler löschen?</h2>
+<p>Soll <strong>@Model.VollerName</strong> (@Model.Email) wirklich gelöscht werden?</p>
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button class="btn btn-danger">Ja, löschen</button>
+    <a asp-action="Index" class="btn btn-link">Abbrechen</a>
+</form>

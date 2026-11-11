@@ -1,0 +1,29 @@
+﻿@model CoachBoard.ViewModels.TrainingFormViewModel
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="Datum" class="form-label"></label>
+        <input asp-for="Datum" type="date" class="form-control" />
+        <span asp-validation-for="Datum" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="Uhrzeit" class="form-label"></label>
+        <input asp-for="Uhrzeit" type="time" class="form-control" />
+        <span asp-validation-for="Uhrzeit" class="text-danger"></span>
+    </div>
+</div>
+<div class="mb-3">
+    <label asp-for="Ort" class="form-label"></label>
+    <input asp-for="Ort" class="form-control" />
+    <span asp-validation-for="Ort" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Beschreibung" class="form-label"></label>
+    <textarea asp-for="Beschreibung" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="Beschreibung" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="GeplanteUebungen" class="form-label"></label>
+    <textarea asp-for="GeplanteUebungen" class="form-control" rows="6"></textarea>
+    <span asp-validation-for="GeplanteUebungen" class="text-danger"></span>
+</div>

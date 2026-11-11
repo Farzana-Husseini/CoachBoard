@@ -1,0 +1,15 @@
+﻿@model CoachBoard.Models.Trainingseinheit
+@{
+    ViewData["Title"] = "Trainingseinheit löschen";
+}
+
+<h2>Trainingseinheit löschen?</h2>
+<p>
+    Soll die Einheit am <strong>@Model.Beginn.ToString("dd.MM.yyyy")</strong>
+    um @Model.Beginn.ToString("HH:mm") Uhr in <strong>@Model.Ort</strong> wirklich gelöscht werden?
+</p>
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button class="btn btn-danger">Ja, löschen</button>
+    <a asp-action="Index" class="btn btn-link">Abbrechen</a>
+</form>
